@@ -9,7 +9,7 @@ void Block::setCoordinates(std::vector<std::pair<int, int>> coordinates) { this-
 std::vector<std::pair<int, int>> Block::getCoordinates() const { 
     std::vector<std::pair<int, int>> position;
     for (auto [px, py]: coordinates) {
-        position.push_back({px += offset.first, py += offset.second});
+        position.push_back({px + offset.first, py + offset.second});
     }
     return position;
 }
@@ -49,7 +49,7 @@ void Block::rotate(bool clockwise) {
     coordinates = rotated_coordinates;
 }
 
-IBlock::IBlock(): Block({{0, 0}, {1, 0}, {2, 0}, {3, 0}}) {}
+IBlock::IBlock(): Block({{0, 1}, {1, 1}, {2, 1}, {3, 1}}) {}
 
 JBlock::JBlock(): Block({{0, 0}, {0, 1}, {1, 1}, {2, 1}}) {}
 

@@ -1,5 +1,6 @@
 #include "game.h"
-#include "textdisplay.h"
+#include <algorithm>
+#include <tuple>
 
 Game::Game(int rows, int cols): gameBoard(new Board{rows, cols}), seed(1738) {
     currentBlock = createBlock();
@@ -120,10 +121,17 @@ void Game::placeBlock() {
     calculateScore();
 }
 
-int Game::getScore() const { return score; }
-
-int Game::getLevel() const { return level; }
-
-int Game::getLines() const { return totalLines; }
-
-char Game::getState(int x, int y) const { return gameBoard->getCell(x, y); }
+std::ostream &operator<<(std::ostream &out, const Game &game) {
+    auto currentCoordinates = game.currentBlock->getCoordinates();
+    for (int row = 0; row < game.gameBoard->getHeight(); ++row) {
+        for (int col = 0; col < game.gameBoard->getWidth(); ++col) {
+            if (std::find(currentCoordinates.begin(), currentCoordinates.end(), std::make_pair(row, col)) != currentCoordinates.end()) {
+                out << game.currentBlock->getType();
+            } else {
+                out << game.gameBoard->getCell(row, col);
+            }
+        }
+        out << '\n';
+    }
+    return out;
+}

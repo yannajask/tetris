@@ -3,8 +3,9 @@
 
 #include "board.h"
 #include "block.h"
+#include <ostream>
 
-class Game: public Subject {
+class Game {
     private:
         Board *gameBoard;
         const int seed;
@@ -18,22 +19,21 @@ class Game: public Subject {
 
         Block *currentBlock;
         Block *nextBlock;
-        Block* createBlock() const;
+        Block *createBlock() const;
         bool doesBlockCollide() const;
-        void rotateBlock(bool clockwise = true);
-        void moveBlockSide(int x);
-        void moveBlockDown();
-        void dropBlock();
-        void placeBlock();
 
     public:
         Game(int rows, int cols);
         ~Game();
 
-        int getScore() const;
-        int getLevel() const;
-        int getLines() const;
-        virtual char getState(int x, int y) const override;
+        // move these to public for testing
+        void rotateBlock(bool clockwise = true);
+        void moveBlockSide(int x);
+        void moveBlockDown();
+        void dropBlock();
+        void placeBlock();
+        
+        friend std::ostream &operator<<(std::ostream &out, const Game &game);
 };
 
 #endif

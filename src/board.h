@@ -1,7 +1,6 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "subject.h"
 #include <memory>
 #include <vector>
 
@@ -15,8 +14,10 @@ class Board {
         Board(int rows, int cols);
         ~Board() = default;
 
-        void setCell(int x, int y, char c);
-        char getCell(int x, int y) const;
+        void setCell(int row, int col, char c);
+        char getCell(int row, int col) const;
+        int getWidth() const;
+        int getHeight() const;
 
         void clear();
         int clearRows();

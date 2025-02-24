@@ -19,7 +19,6 @@ class Block {
 
         void shift(int x, int y);
         void rotate(bool clockwise = true);
-        void drop();
 };
 
 class IBlock: public Block {

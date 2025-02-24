@@ -1,26 +1,29 @@
 #include "board.h"
-#include <iostream>
 
 Board::Board(int rows, int cols): rows(rows), cols(cols), cells(rows, std::vector<char>(cols, ' ')) {}
 
-void Board::setCell(int x, int y, char c) { cells[x][y] = c; }
+void Board::setCell(int row, int col, char c) { cells[row][col] = c; }
 
-char Board::getCell(int x, int y) const { return cells[x][y]; }
+char Board::getCell(int row, int col) const { return cells[row][col]; }
+
+int Board::getHeight() const { return rows; }
+
+int Board::getWidth() const { return cols; }
 
 void Board::clear() {
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < rows; ++j) {
-            cells[i][j] = ' ';
+    for (int row = 0; row < rows; ++row) {
+        for (int col = 0; cols < cols; ++col) {
+            cells[row][col] = ' ';
         }
     }
 }
 
 int Board::clearRows() {
     int rowsCleared = 0;
-    for (int i = 0; i < rows; ++i) {
+    for (int row = 0; row < rows; ++row) {
         bool isFull = true;
-        for (int j = 0; j < rows; ++j) {
-            if (cells[i][j] == ' ') {
+        for (int col = 0; col < cols; ++col) {
+            if (cells[row][col] == ' ') {
                 isFull = false;
                 break;
             }
@@ -28,8 +31,8 @@ int Board::clearRows() {
 
         if (isFull) {
             ++rowsCleared;
-            for (int j = 0; j < rows; ++j) {
-                cells[i][j] = ' ';
+            for (int col = 0; col < cols; ++col) {
+                cells[row][col] = ' ';
             }
         }
 
@@ -39,4 +42,4 @@ int Board::clearRows() {
     return rowsCleared;
 }
 
-bool Board::isInside(int x, int y) const { return ((x >= 0 && x < rows) && (y >= 0 && y < cols)); }
+bool Board::isInside(int row, int col) const { return ((row >= 0 && row < rows) && (col >= 0 && col < cols)); }
