@@ -14,8 +14,8 @@ class Board {
         Board(int rows, int cols);
         ~Board() = default;
 
-        void setCell(int row, int col, char c);
-        char getCell(int row, int col) const;
+        void setCell(int x, int y, char c);
+        char getCell(int x, int y) const;
         int getWidth() const;
         int getHeight() const;
 

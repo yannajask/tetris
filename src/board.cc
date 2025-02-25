@@ -2,28 +2,28 @@
 
 Board::Board(int rows, int cols): rows(rows), cols(cols), cells(rows, std::vector<char>(cols, ' ')) {}
 
-void Board::setCell(int row, int col, char c) { cells[row][col] = c; }
+void Board::setCell(int x, int y, char c) { cells[y][x] = c; }
 
-char Board::getCell(int row, int col) const { return cells[row][col]; }
+char Board::getCell(int x, int y) const { return cells[y][x]; }
 
 int Board::getHeight() const { return rows; }
 
 int Board::getWidth() const { return cols; }
 
 void Board::clear() {
-    for (int row = 0; row < rows; ++row) {
-        for (int col = 0; cols < cols; ++col) {
-            cells[row][col] = ' ';
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            cells[i][j] = ' ';
         }
     }
 }
 
 int Board::clearRows() {
     int rowsCleared = 0;
-    for (int row = 0; row < rows; ++row) {
+    for (int i = 0; i < rows; ++i) {
         bool isFull = true;
-        for (int col = 0; col < cols; ++col) {
-            if (cells[row][col] == ' ') {
+        for (int j = 0; j < cols; ++j) {
+            if (cells[i][j] == ' ') {
                 isFull = false;
                 break;
             }
@@ -31,8 +31,8 @@ int Board::clearRows() {
 
         if (isFull) {
             ++rowsCleared;
-            for (int col = 0; col < cols; ++col) {
-                cells[row][col] = ' ';
+            for (int j = 0; j < cols; ++j) {
+                cells[i][j] = ' ';
             }
         }
 
@@ -42,4 +42,4 @@ int Board::clearRows() {
     return rowsCleared;
 }
 
-bool Board::isInside(int row, int col) const { return ((row >= 0 && row < rows) && (col >= 0 && col < cols)); }
+bool Board::isInside(int x, int y) const { return ((x >= 0 && x < cols) && (y >= 0 && y < rows)); }

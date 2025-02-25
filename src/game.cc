@@ -3,6 +3,7 @@
 #include <tuple>
 
 Game::Game(int rows, int cols): gameBoard(new Board{rows, cols}), seed(1738) {
+    srand(seed);
     currentBlock = createBlock();
     nextBlock = createBlock();
 }
@@ -75,10 +76,9 @@ Block* Game::createBlock() const {
 
 bool Game::doesBlockCollide() const {
     for (auto [px, py]: currentBlock->getCoordinates()) {
-        if (!(gameBoard->isInside(px, py))) return false;
-        if (gameBoard->getCell(px, py) != ' ') return false;
+        if (!(gameBoard->isInside(px, py)) || gameBoard->getCell(px, py) != ' ') return true;
     }
-    return true;
+    return false;
 }
 
 void Game::rotateBlock(bool clockwise) {
@@ -123,12 +123,12 @@ void Game::placeBlock() {
 
 std::ostream &operator<<(std::ostream &out, const Game &game) {
     auto currentCoordinates = game.currentBlock->getCoordinates();
-    for (int row = 0; row < game.gameBoard->getHeight(); ++row) {
-        for (int col = 0; col < game.gameBoard->getWidth(); ++col) {
-            if (std::find(currentCoordinates.begin(), currentCoordinates.end(), std::make_pair(row, col)) != currentCoordinates.end()) {
+    for (int j = 0; j < game.gameBoard->getHeight(); ++j) {
+        for (int i = 0; i < game.gameBoard->getWidth(); ++i) {
+            if (std::find(currentCoordinates.begin(), currentCoordinates.end(), std::make_pair(i, j)) != currentCoordinates.end()) {
                 out << game.currentBlock->getType();
             } else {
-                out << game.gameBoard->getCell(row, col);
+                out << game.gameBoard->getCell(i, j);
             }
         }
         out << '\n';
