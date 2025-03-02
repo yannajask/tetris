@@ -11,32 +11,30 @@ int Board::getHeight() const { return rows; }
 int Board::getWidth() const { return cols; }
 
 void Board::clear() {
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            cells[i][j] = ' ';
-        }
+    for (auto &row: cells) {
+        row = std::vector<char>(cols, ' ');
     }
 }
 
 int Board::clearRows() {
     int rowsCleared = 0;
-    for (int i = 0; i < rows; ++i) {
-        bool isFull = true;
-        for (int j = 0; j < cols; ++j) {
-            if (cells[i][j] == ' ') {
-                isFull = false;
+    
+    for (auto rowIt = cells.begin(); rowIt != cells.end(); ) {
+        bool full = true;
+        for (auto cell: *rowIt) {
+            if (cell == ' ') {
+                full = false;
                 break;
             }
         }
 
-        if (isFull) {
+        if (full) {
+            rowIt = cells.erase(rowIt);
+            cells.insert(cells.begin(), std::vector<char>(cols, ' '));
             ++rowsCleared;
-            for (int j = 0; j < cols; ++j) {
-                cells[i][j] = ' ';
-            }
+        } else {
+            ++rowIt;
         }
-
-        // need to also move rows down
     }
 
     return rowsCleared;

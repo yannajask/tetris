@@ -1,7 +1,7 @@
 # Makefile, adapted from CS 246
 
 CXX = g++
-CXXFLAGS = -std=c++20 -g -Wall -Werror=vla -MD -D_DARWIN_C_SOURCE -DNCURSES_WIDECHAR -I/opt/homebrew/opt/ncurses/include -L/opt/homebrew/opt/ncurses/lib
+CXXFLAGS = -std=c++20 -g -Wall -Werror=vla -MD -fsanitize=undefined -D_DARWIN_C_SOURCE -DNCURSES_WIDECHAR -I/opt/homebrew/opt/ncurses/include -L/opt/homebrew/opt/ncurses/lib
 MAKEFILE_NAME = ${firstword ${MAKEFILE_LIST}}
 
 ###
@@ -9,7 +9,7 @@ MAKEFILE_NAME = ${firstword ${MAKEFILE_LIST}}
 SOURCES = $(wildcard *.cc)
 OBJECTS = ${SOURCES:.cc=.o}
 DEPENDS = ${OBJECTS:.o=.d}
-EXEC = tetris
+EXEC = tetrisV2
 
 ###
 

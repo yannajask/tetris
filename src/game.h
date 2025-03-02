@@ -18,7 +18,7 @@ class Game {
         mutable std::mt19937 gen;
         mutable std::uniform_int_distribution<> dis;
 
-        int framerate = 15;
+        int framerate = 48;
         int score = 0;
         int level = 0;
         int levelLines = 0;
@@ -31,19 +31,19 @@ class Game {
         Block *createBlock() const;
         bool doesBlockCollide() const;
 
-    public:
-        Game(int rows, int cols);
-        ~Game();
-
-        void play();
-
-        // move these to public for testing
         void rotateBlock(bool clockwise = true);
         void moveBlockSide(int x);
         void moveBlockDown();
         void dropBlock();
         void placeBlock();
-        void draw();
+
+        void handleInput(bool &running);
+
+    public:
+        Game(int rows, int cols);
+        ~Game();
+
+        void play();
         
         friend std::ostream &operator<<(std::ostream &out, const Game &game);
         Block *getNextBlock() const;

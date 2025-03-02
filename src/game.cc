@@ -6,6 +6,7 @@
 
 Game::Game(int rows, int cols): gameBoard(new Board{rows + 2, cols}), gen(rd()), dis(0, 6) {
     currentBlock = createBlock();
+    currentBlock->shift(3, 0);
     nextBlock = createBlock();
     graphics = new Display{this, rows, cols};
 }
@@ -40,8 +41,8 @@ void Game::calculateScore() {
         levelLines += rowsCleared;
         totalLines += rowsCleared;
 
-        if (levelLines >= level * 10) {
-            levelLines -= level * 10;
+        if (levelLines >= (level + 1) * 10) {
+            levelLines -= (level + 1) * 10;
             ++level;
 
             // for levels 0-9, decrease frames per cell by 5
@@ -66,6 +67,7 @@ void Game::reset() {
     if (currentBlock) delete currentBlock;
     if (nextBlock) delete nextBlock;
     currentBlock = createBlock();
+    currentBlock->shift(3, 0);
     nextBlock = createBlock();
 }
 
@@ -132,9 +134,38 @@ void Game::placeBlock() {
     }
     delete currentBlock;
     currentBlock = nextBlock;
+    currentBlock->shift(3, 0);
     if (doesBlockCollide()) reset();
     nextBlock = createBlock();
     calculateScore();
+}
+
+void Game::handleInput(bool &running) {
+    // to do: create controller class to decouple input handling
+    int cmd = getch();
+    switch (cmd) {
+        case KEY_LEFT:
+            moveBlockSide(-1);
+            break;
+        case KEY_RIGHT:
+            moveBlockSide(1);
+            break;
+        case KEY_DOWN:
+            moveBlockDown();
+            break;
+        case 'a':
+            rotateBlock();
+            break;
+        case 'd':
+            rotateBlock(false);
+            break;
+        case ' ':
+            dropBlock();
+            break;
+        case 'q':
+            running = false;
+            break;
+    }
 }
 
 void Game::play() {
@@ -148,10 +179,7 @@ void Game::play() {
     while (running) {
         auto start = clock::now();
 
-        if (getch() == 'q') {
-            running = false;
-            break;
-        }
+        handleInput(running);
 
         auto elapsedTime = start - lastMoveTime;
         if (elapsedTime >= moveInterval) {
@@ -196,5 +224,3 @@ int Game::getScore() const { return score; }
 int Game::getLevel() const { return level; }
 
 int Game::getLines() const { return totalLines; }
-
-void Game::draw() { graphics->render(); }

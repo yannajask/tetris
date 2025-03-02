@@ -2,7 +2,9 @@
 #include "display.h"
 #include <sstream>
 
-Display::Display(Game *subject, int rows, int cols): subject{subject}, rows{rows}, cols{cols} {
+Display::Display(Game *subject, int rows, int cols): subject{subject}, rows{rows}, cols{cols}, rgb{has_colors()} {
+    if (rgb) initColorMap();
+    
     board = newwin(rows + 2, (cols * 2) + 2, 0, 0);
     drawBorder(board, rows + 2, (cols * 2) + 2, 0, 0, "");
     render();
@@ -17,19 +19,43 @@ Display::Display(Game *subject, int rows, int cols): subject{subject}, rows{rows
 
 Display::~Display() {}
 
+void Display::initColorMap() {
+    init_pair(1, 39, 0);   // teal
+    init_pair(2, 25, 0);   // blue
+    init_pair(3, 208, 0);  // orange
+    init_pair(4, 220, 0);  // yellow
+    init_pair(5, 112, 0);  // green
+    init_pair(6, 90, 0);   // purple
+    init_pair(7, 196, 0);  // red
+    init_pair(8, 0, 255);  // black
+    init_pair(9, 231, 255);// white
+
+    colorMap = {{'I', 1},
+                {'J', 2},
+                {'L', 3},
+                {'O', 4},
+                {'S', 5},
+                {'T', 6},
+                {'Z', 7}};
+
+    assume_default_colors(0, 255);
+}
+
 void Display::drawBorder(WINDOW *w, int height, int width, int row, int col, const std::string &text) {
-    // darker colour
+    wattron(w, COLOR_PAIR(8));
     mvwhline(w, row, col + 1, 0, width - 2);
     mvwvline(w, row + 1, col, 0, height - 2);
     mvwaddch(w, row, col, ACS_ULCORNER);
     mvwaddch(w, row + height - 1, col, ACS_LLCORNER);
-    if (text != "") mvwaddstr(w, row, col + 1, text.c_str()); 
+    if (text != "") mvwaddstr(w, row, col + 1, text.c_str());
+    wattroff(w, COLOR_PAIR(8)); 
 
-    // lighter colour
+    wattron(w, COLOR_PAIR(9));
     mvwhline(w, row + height - 1, col + 1, 0, width - 2);
     mvwvline(w, row + 1, col + width - 1, 0, height - 2);
     mvwaddch(w, row, col + width - 1, ACS_URCORNER);
     mvwaddch(w, row + height - 1, col + width - 1, ACS_LRCORNER);
+    wattroff(w, COLOR_PAIR(9));
 }
 
 void Display::render() {
@@ -46,7 +72,10 @@ void Display::render() {
             ++row;
             col = 1;
         } else if (pixel != ' ') {
+            int colorPair = colorMap[pixel];
+            wattron(board, COLOR_PAIR(colorPair));
             mvwaddwstr(board, row, col, L"██");
+            wattroff(board, COLOR_PAIR(colorPair));
             col += 2;
         } else {
             mvwaddwstr(board, row, col, L"  ");
@@ -65,7 +94,10 @@ void Display::updateInfo() {
     for (int j = 1; j < 3; ++j) {
         for (int i = 1; i < 5; ++i) {
             if (std::find(nextCoordinates.begin(), nextCoordinates.end(), std::make_pair(i - 1, j - 1)) != nextCoordinates.end()) {
+                int colorPair = colorMap[nextType];
+                wattron(info, COLOR_PAIR(colorPair));
                 mvwaddwstr(info, j, (i * 2) - 1, L"██");
+                wattroff(info, COLOR_PAIR(colorPair));
             } else {
                 mvwaddwstr(info, j, (i * 2) - 1, L"  ");
             }
