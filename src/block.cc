@@ -8,8 +8,8 @@ void Block::setCoordinates(std::vector<std::pair<int, int>> coordinates) { this-
 
 std::vector<std::pair<int, int>> Block::getCoordinates() const { 
     std::vector<std::pair<int, int>> position;
-    for (auto [px, py]: coordinates) {
-        position.push_back({px + offset.first, py + offset.second});
+    for (auto [x, y]: coordinates) {
+        position.push_back({x + offset.first, y + offset.second});
     }
     return position;
 }
@@ -19,34 +19,40 @@ void Block::shift(int x, int y) {
     offset.second += y;
 }
 
+//
+// TO DO: need to fix this method since pivot is calculated incorrectly
+//
 void Block::rotate(bool clockwise) {
-    std::vector<std::pair<int, int>> rotated_coordinates;
+    std::vector<std::pair<int, int>> rotatedCoordinates;
     // if clockwise: (x, y) -> (-y, x)
     //         else: (x, y) -> (y, -x)
     int ri = clockwise? 1 : -1;
 
-    int old_min_x = INT_MAX;
-    int old_max_y = INT_MIN;
-    int new_min_x = INT_MAX;
-    int new_max_y = INT_MIN;
+    int oldMinX = INT_MAX;
+    int oldMinY = INT_MAX;
+    int newMinX = INT_MAX;
+    int newMinY = INT_MAX;
 
-    for (auto [px, py]: coordinates) {
-        if (px < old_min_x) old_min_x = px;
-        if (py > old_max_y) old_max_y = py;
-        if (-py * ri < new_min_x) new_min_x = -py * ri;
-        if (px * ri > new_max_y) new_max_y = px * ri;
-        rotated_coordinates.push_back({-py * ri, px * ri});
+    for (auto [x, y]: coordinates) {
+        if (x < oldMinX) oldMinX = x;
+        if (y < oldMinY) oldMinY = y;
+
+        int newX = -y * ri;
+        int newY = x * ri;
+        rotatedCoordinates.push_back({newX, newY});
+
+        if (newX < newMinX) newMinX = newX;
+        if (newY < newMinY) newMinY = newY;
     }
 
-    std::pair<int, int> rotation_offset = {new_min_x - old_min_x, new_max_y - old_max_y};
+    std::pair<int, int> rotation_offset = {newMinX - oldMinX, newMinY - oldMinY};
 
-    for (auto &[px, py]: rotated_coordinates) {
-        px -= rotation_offset.first;
-        py -= rotation_offset.second;
+    for (auto &[x, y]: rotatedCoordinates) {
+        x -= rotation_offset.first;
+        y -= rotation_offset.second;
     }
 
-    // check for collisions i'd assume
-    coordinates = rotated_coordinates;
+    this->coordinates = rotatedCoordinates;
 }
 
 IBlock::IBlock(): Block({{0, 1}, {1, 1}, {2, 1}, {3, 1}}) {}
@@ -57,7 +63,7 @@ LBlock::LBlock(): Block({{0, 1}, {1, 1}, {2, 1}, {2, 0}}) {}
 
 OBlock::OBlock(): Block({{1, 0}, {2, 0}, {1, 1}, {2, 1}}) {}
 
-SBlock::SBlock(): Block({{0, 1}, {1, 0}, {1, 1}, {0, 1}}) {}
+SBlock::SBlock(): Block({{0, 1}, {1, 0}, {1, 1}, {2, 0}}) {}
 
 TBlock::TBlock(): Block({{0, 1}, {1, 0}, {1, 1}, {2, 1}}) {}
 

@@ -4,12 +4,17 @@
 #include "board.h"
 #include "block.h"
 #include <ostream>
+#include <random>
 
 class Game {
     private:
         Board *gameBoard;
-        const int seed;
 
+        mutable std::random_device rd;
+        mutable std::mt19937 gen;
+        mutable std::uniform_int_distribution<> dis;
+
+        int framerate = 48;
         int score = 0;
         int level = 0;
         int levelLines = 0;
@@ -25,6 +30,8 @@ class Game {
     public:
         Game(int rows, int cols);
         ~Game();
+
+        void play();
 
         // move these to public for testing
         void rotateBlock(bool clockwise = true);
