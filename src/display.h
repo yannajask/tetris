@@ -4,6 +4,8 @@
 #include "game.h"
 #include <ncursesw/curses.h>
 
+class Game;
+
 class Display {
     private:
         Game *subject;
@@ -16,12 +18,11 @@ class Display {
         void drawBorder(WINDOW *w, int height, int width, int row, int col, const std::string &text);
 
     public:
-        Display(Game &subject, int rows, int cols);
+        Display(Game *subject, int rows, int cols);
         ~Display();
 
         void render();
         void updateInfo();
-        void reset();
 };
 
 #endif

@@ -7,6 +7,8 @@
 #include <ostream>
 #include <random>
 
+class Display;
+
 class Game {
     private:
         Board *gameBoard;
@@ -16,7 +18,7 @@ class Game {
         mutable std::mt19937 gen;
         mutable std::uniform_int_distribution<> dis;
 
-        int framerate = 48;
+        int framerate = 15;
         int score = 0;
         int level = 0;
         int levelLines = 0;
@@ -41,8 +43,13 @@ class Game {
         void moveBlockDown();
         void dropBlock();
         void placeBlock();
+        void draw();
         
         friend std::ostream &operator<<(std::ostream &out, const Game &game);
+        Block *getNextBlock() const;
+        int getScore() const;
+        int getLevel() const;
+        int getLines() const;
 };
 
 #endif

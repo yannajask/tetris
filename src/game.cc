@@ -4,15 +4,17 @@
 #include <chrono>
 #include <thread>
 
-Game::Game(int rows, int cols): gameBoard(new Board{rows + 2, cols}), graphics(new Display{*this, rows, cols}), gen(rd()), dis(0, 6) {
+Game::Game(int rows, int cols): gameBoard(new Board{rows + 2, cols}), gen(rd()), dis(0, 6) {
     currentBlock = createBlock();
     nextBlock = createBlock();
+    graphics = new Display{this, rows, cols};
 }
 
 Game::~Game() {
     delete currentBlock;
     delete nextBlock;
     delete gameBoard;
+    delete graphics;
 }
 
 void Game::calculateScore() {
@@ -51,6 +53,8 @@ void Game::calculateScore() {
             }
         }
     }
+    // to do: update next block seperately
+    graphics->updateInfo();
 }
 
 void Game::reset() {
@@ -59,8 +63,8 @@ void Game::reset() {
     level = 0;
     levelLines = 0;
     totalLines = 0;
-    delete currentBlock;
-    delete nextBlock;
+    if (currentBlock) delete currentBlock;
+    if (nextBlock) delete nextBlock;
     currentBlock = createBlock();
     nextBlock = createBlock();
 }
@@ -123,8 +127,8 @@ void Game::dropBlock() {
 }
 
 void Game::placeBlock() {
-    for (auto [px, py]: currentBlock->getCoordinates()) {
-        gameBoard->setCell(px, py, currentBlock->getType());
+    for (auto [x, y]: currentBlock->getCoordinates()) {
+        gameBoard->setCell(x, y, currentBlock->getType());
     }
     delete currentBlock;
     currentBlock = nextBlock;
@@ -144,7 +148,10 @@ void Game::play() {
     while (running) {
         auto start = clock::now();
 
-        // handle input
+        if (getch() == 'q') {
+            running = false;
+            break;
+        }
 
         auto elapsedTime = start - lastMoveTime;
         if (elapsedTime >= moveInterval) {
@@ -152,7 +159,7 @@ void Game::play() {
             lastMoveTime = start;
         }
 
-        // render board
+        graphics->render();
 
         auto end = clock::now();
         if (end - start < fps_60(1)) {
@@ -175,8 +182,19 @@ std::ostream &operator<<(std::ostream &out, const Game &game) {
                 out << game.gameBoard->getCell(i, j);
             }
         }
+        
         out << '\n';
     }
 
     return out;
 }
+
+Block* Game::getNextBlock() const { return nextBlock; }
+
+int Game::getScore() const { return score; }
+
+int Game::getLevel() const { return level; }
+
+int Game::getLines() const { return totalLines; }
+
+void Game::draw() { graphics->render(); }
