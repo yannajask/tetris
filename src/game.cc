@@ -4,7 +4,7 @@
 #include <chrono>
 #include <thread>
 
-Game::Game(int rows, int cols): gameBoard(new Board{rows + 2, cols}), gen(rd()), dis(0, 6) {
+Game::Game(int rows, int cols): gameBoard(new Board{rows + 2, cols}), graphics(new Display{*this, rows, cols}), gen(rd()), dis(0, 6) {
     currentBlock = createBlock();
     nextBlock = createBlock();
 }

@@ -3,12 +3,14 @@
 
 #include "board.h"
 #include "block.h"
+#include "display.h"
 #include <ostream>
 #include <random>
 
 class Game {
     private:
         Board *gameBoard;
+        Display *graphics;
 
         mutable std::random_device rd;
         mutable std::mt19937 gen;
