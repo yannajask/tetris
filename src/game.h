@@ -6,13 +6,14 @@
 #include "display.h"
 #include <ostream>
 #include <random>
+#include <memory>
 
 class Display;
 
 class Game {
     private:
-        Board *gameBoard;
-        Display *graphics;
+        std::unique_ptr<Board> gameBoard;
+        std::unique_ptr<Display> graphics;
 
         mutable std::random_device rd;
         mutable std::mt19937 gen;
@@ -26,9 +27,9 @@ class Game {
         void calculateScore();
         void reset();
 
-        Block *currentBlock;
-        Block *nextBlock;
-        Block *createBlock() const;
+        std::unique_ptr<Block> currentBlock;
+        std::unique_ptr<Block> nextBlock;
+        std::unique_ptr<Block> createBlock() const;
         bool doesBlockCollide() const;
 
         void rotateBlock(bool clockwise = true);

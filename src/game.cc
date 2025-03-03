@@ -4,19 +4,16 @@
 #include <chrono>
 #include <thread>
 
-Game::Game(int rows, int cols): gameBoard(new Board{rows + 2, cols}), gen(rd()), dis(0, 6) {
+// to do: decouple graphics from game, use observer pattern instead
+// also would be better to use smart pointers
+Game::Game(int rows, int cols): gameBoard(std::make_unique<Board>(rows + 2, cols)), gen(rd()), dis(0, 6) {
     currentBlock = createBlock();
     currentBlock->shift(3, 0);
     nextBlock = createBlock();
-    graphics = new Display{this, rows, cols};
+    graphics = std::make_unique<Display>(this, rows, cols);
 }
 
-Game::~Game() {
-    delete currentBlock;
-    delete nextBlock;
-    delete gameBoard;
-    delete graphics;
-}
+Game::~Game() {}
 
 void Game::calculateScore() {
     int rowsCleared = gameBoard->clearRows();
@@ -64,30 +61,30 @@ void Game::reset() {
     level = 0;
     levelLines = 0;
     totalLines = 0;
-    if (currentBlock) delete currentBlock;
-    if (nextBlock) delete nextBlock;
     currentBlock = createBlock();
     currentBlock->shift(3, 0);
     nextBlock = createBlock();
+    graphics->render();
+    graphics->updateInfo();
 }
 
-Block* Game::createBlock() const {
+std::unique_ptr<Block> Game::createBlock() const {
     int x = dis(gen);
     switch (x) {
         case 0:
-            return new IBlock();
+            return std::make_unique<IBlock>();
         case 1:
-            return new JBlock();
+            return std::make_unique<JBlock>();
         case 2:
-            return new LBlock();
+            return std::make_unique<LBlock>();
         case 3:
-            return new OBlock();
+            return std::make_unique<OBlock>();
         case 4:
-            return new SBlock();
+            return std::make_unique<SBlock>();
         case 5:
-            return new TBlock();
+            return std::make_unique<TBlock>();
         default:
-            return new ZBlock();
+            return std::make_unique<ZBlock>();
     }
 }
 
@@ -132,12 +129,16 @@ void Game::placeBlock() {
     for (auto [x, y]: currentBlock->getCoordinates()) {
         gameBoard->setCell(x, y, currentBlock->getType());
     }
-    delete currentBlock;
-    currentBlock = nextBlock;
+
+    currentBlock = std::move(nextBlock);
     currentBlock->shift(3, 0);
-    if (doesBlockCollide()) reset();
-    nextBlock = createBlock();
-    calculateScore();
+
+    if (doesBlockCollide()) {
+        reset();
+    } else {
+        nextBlock = createBlock();
+        calculateScore();
+    }
 }
 
 void Game::handleInput(bool &running) {
@@ -217,7 +218,7 @@ std::ostream &operator<<(std::ostream &out, const Game &game) {
     return out;
 }
 
-Block* Game::getNextBlock() const { return nextBlock; }
+Block* Game::getNextBlock() const { return nextBlock.get(); } // non-owning pointer
 
 int Game::getScore() const { return score; }
 
