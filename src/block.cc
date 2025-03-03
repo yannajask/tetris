@@ -19,9 +19,8 @@ void Block::shift(int x, int y) {
     offset.second += y;
 }
 
-//
-// TO DO: need to fix this method since pivot is calculated incorrectly
-//
+
+// to do: might be better to implement SSR for rotations
 void Block::rotate(bool clockwise) {
     std::vector<std::pair<int, int>> rotatedCoordinates;
     // if clockwise: (x, y) -> (-y, x)
