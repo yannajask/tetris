@@ -65,6 +65,7 @@ void Game::reset() {
     currentBlock->shift(3, 0);
     nextBlock = createBlock();
     graphics->render();
+    graphics->updateNextBlock();
     graphics->updateInfo();
 }
 
@@ -137,6 +138,7 @@ void Game::placeBlock() {
         reset();
     } else {
         nextBlock = createBlock();
+        graphics->updateNextBlock();
         calculateScore();
     }
 }
