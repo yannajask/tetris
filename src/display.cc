@@ -2,34 +2,55 @@
 #include "display.h"
 #include <sstream>
 
-Display::Display(Game *subject, int rows, int cols): subject{subject}, rows{rows}, cols{cols}, rgb{has_colors()} {
+Display::Display(Game *subject, int rows, int cols): subject{subject}, rgb{has_colors()} {
     if (rgb) initColorMap();
+
+    int windowHeight = rows + 10; int windowWidth = (cols * 2) + 19;
+    int yMax; int xMax;
+    getmaxyx(stdscr, yMax, xMax);
+    mainWindow = newwin(windowHeight, windowWidth, (yMax / 2) - (windowHeight / 2), (xMax / 2) - (windowWidth / 2));
+    drawBorder(mainWindow, windowHeight - 1, windowWidth - 2, 0, 0, "", true);
+
+    int textOffset = (windowWidth - 26) / 2;
+    mvwaddwstr(mainWindow, 1, textOffset, L" _____     _       _");
+    mvwaddwstr(mainWindow, 2, textOffset, L"|_   _|___| |_ ___|_|___");
+    mvwaddwstr(mainWindow, 3, textOffset, L"  | | | -_|  _|  _| |_ -|");
+    mvwaddwstr(mainWindow, 4, textOffset, L"  |_| |___|_| |_| |_|___|");
+ 
+    wrefresh(mainWindow);
     
-    board = newwin(rows + 2, (cols * 2) + 2, 0, 0);
+    board = derwin(mainWindow, rows + 2, (cols * 2) + 2, 6, 2);
     drawBorder(board, rows + 2, (cols * 2) + 2, 0, 0, "");
     render();
 
-    info = newwin(rows + 2, 10, 0, (cols * 2) + 3);
-    drawBorder(info, 4, 10, 0, 0, "Next");
-    drawBorder(info, 3, 10, rows - 7, 0, "Score");
-    drawBorder(info, 3, 10, rows - 4, 0, "Level");
-    drawBorder(info, 3, 10, rows - 1, 0, "Lines");
+    nextBlock = derwin(mainWindow, 4, 10, 6, (cols * 2) + 5);
+    drawBorder(nextBlock, 4, 10, 0, 0, "Next");
+    updateNextBlock();
+    
+    gameInfo = derwin(mainWindow, 9, 10, rows - 1, (cols * 2) + 5);
+    drawBorder(gameInfo, 3, 10, 0, 0, "Score");
+    drawBorder(gameInfo, 3, 10, 3, 0, "Level");
+    drawBorder(gameInfo, 3, 10, 6, 0, "Lines");
     updateInfo();
+
 }
 
 Display::~Display() {}
 
 void Display::initColorMap() {
-    init_pair(1, 39, 0);   // teal
-    init_pair(2, 25, 0);   // blue
-    init_pair(3, 208, 0);  // orange
-    init_pair(4, 220, 0);  // yellow
-    init_pair(5, 112, 0);  // green
-    init_pair(6, 90, 0);   // purple
-    init_pair(7, 196, 0);  // red
-    init_pair(8, 0, 255);  // black
-    init_pair(9, 231, 255);// white
+    init_pair(1, 39, 238);    // teal
+    init_pair(2, 25, 238);    // blue
+    init_pair(3, 208, 238);   // orange
+    init_pair(4, 220, 238);   // yellow
+    init_pair(5, 112, 238);   // green
+    init_pair(6, 90, 238);    // purple
+    init_pair(7, 196, 238);   // red
+    init_pair(8, 238, 187);   // black
+    init_pair(9, 230, 187);  // white
+    init_pair(10, 152, 152);
+    init_pair(11, 238, 238);
 
+    // to do: maybe move map somewhere else
     colorMap = {{'I', 1},
                 {'J', 2},
                 {'L', 3},
@@ -38,10 +59,12 @@ void Display::initColorMap() {
                 {'T', 6},
                 {'Z', 7}};
 
-    assume_default_colors(0, 255);
+    bkgd(COLOR_PAIR(10));
+    assume_default_colors(238, 187);
+    refresh();
 }
 
-void Display::drawBorder(WINDOW *w, int height, int width, int row, int col, const std::string &text) {
+void Display::drawBorder(WINDOW *w, int height, int width, int row, int col, const std::string &text, bool shadow) {
     wattron(w, COLOR_PAIR(8));
     mvwhline(w, row, col + 1, 0, width - 2);
     mvwvline(w, row + 1, col, 0, height - 2);
@@ -49,6 +72,19 @@ void Display::drawBorder(WINDOW *w, int height, int width, int row, int col, con
     mvwaddch(w, row + height - 1, col, ACS_LLCORNER);
     if (text != "") mvwaddstr(w, row, col + 1, text.c_str());
     wattroff(w, COLOR_PAIR(8)); 
+
+    if (shadow) {
+        wattron(w, COLOR_PAIR(10));
+        mvwaddstr(w, row, width, "  ");
+        mvwaddstr(w, height, col, "  ");
+        wattroff(w, COLOR_PAIR(10));
+
+        wattron(w, COLOR_PAIR(11));
+        mvwhline(w, height, col + 2, ' ', width);
+        mvwvline(w, row + 1, width, ' ', height);
+        mvwvline(w, row + 1, width + 1, ' ', height);
+        wattroff(w, COLOR_PAIR(11));
+    }
 
     wattron(w, COLOR_PAIR(9));
     mvwhline(w, row + height - 1, col + 1, 0, width - 2);
@@ -74,11 +110,13 @@ void Display::render() {
         } else if (pixel != ' ') {
             int colorPair = colorMap[pixel];
             wattron(board, COLOR_PAIR(colorPair));
-            mvwaddwstr(board, row, col, L"██");
+            mvwaddwstr(board, row, col, L"█▉");
             wattroff(board, COLOR_PAIR(colorPair));
             col += 2;
         } else {
-            mvwaddwstr(board, row, col, L"  ");
+            wattron(board, COLOR_PAIR(8));
+            mvwaddwstr(board, row, col, L"▒▒");
+            wattroff(board, COLOR_PAIR(8));
             col += 2;
         }
     }
@@ -86,8 +124,7 @@ void Display::render() {
     wrefresh(board);
 }
 
-void Display::updateInfo() {
-    // print next block
+void Display::updateNextBlock() {
     auto nextCoordinates = subject->getNextBlock()->getCoordinates();
     char nextType = subject->getNextBlock()->getType();
 
@@ -95,18 +132,23 @@ void Display::updateInfo() {
         for (int i = 1; i < 5; ++i) {
             if (std::find(nextCoordinates.begin(), nextCoordinates.end(), std::make_pair(i - 1, j - 1)) != nextCoordinates.end()) {
                 int colorPair = colorMap[nextType];
-                wattron(info, COLOR_PAIR(colorPair));
-                mvwaddwstr(info, j, (i * 2) - 1, L"██");
-                wattroff(info, COLOR_PAIR(colorPair));
+                wattron(nextBlock, COLOR_PAIR(colorPair));
+                mvwaddwstr(nextBlock, j, (i * 2) - 1, L"█▉");
+                wattroff(nextBlock, COLOR_PAIR(colorPair));
             } else {
-                mvwaddwstr(info, j, (i * 2) - 1, L"  ");
+                wattron(nextBlock, COLOR_PAIR(8));
+                mvwaddwstr(nextBlock, j, (i * 2) - 1, L"▒▒");
+                wattroff(nextBlock, COLOR_PAIR(8));
             }
         }
     }
 
-    // print score, level, lines
-    mvwprintw(info, rows - 6, 1, "%d", subject->getScore());
-    mvwprintw(info, rows - 3, 1, "%d", subject->getLevel());
-    mvwprintw(info, rows, 1, "%d", subject->getLines());
-    wrefresh(info);
+    wrefresh(nextBlock);
+}
+
+void Display::updateInfo() {
+    mvwprintw(gameInfo, 1, 1, "%-8d", subject->getScore());
+    mvwprintw(gameInfo, 4, 1, "%-8d", subject->getLevel());
+    mvwprintw(gameInfo, 7, 1, "%-8d", subject->getLines());
+    wrefresh(gameInfo);
 }

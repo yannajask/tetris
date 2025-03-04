@@ -11,23 +11,23 @@ class Display {
     private:
         Game *subject;
 
-        const int rows;
-        const int cols;
-        const bool rgb;
-
+        WINDOW *mainWindow;
         WINDOW *board;
-        WINDOW *info;
+        WINDOW *nextBlock;
+        WINDOW *gameInfo;
 
+        const bool rgb;
         std::map<char, int> colorMap;
         void initColorMap();
 
-        void drawBorder(WINDOW *w, int height, int width, int row, int col, const std::string &text);
+        void drawBorder(WINDOW *w, int height, int width, int row, int col, const std::string &text, bool shadow = false);
 
     public:
         Display(Game *subject, int rows, int cols);
         ~Display();
 
         void render();
+        void updateNextBlock();
         void updateInfo();
 };
 
