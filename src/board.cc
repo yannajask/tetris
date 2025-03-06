@@ -2,9 +2,9 @@
 
 Board::Board(int rows, int cols): rows(rows), cols(cols), cells(rows, std::vector<char>(cols, ' ')) {}
 
-void Board::setCell(int x, int y, char c) { cells[y][x] = c; }
+void Board::setCell(int row, int col, char c) { cells[row][col] = c; }
 
-char Board::getCell(int x, int y) const { return cells[y][x]; }
+char Board::getCell(int row, int col) const { return cells[row][col]; }
 
 int Board::getHeight() const { return rows; }
 
@@ -40,4 +40,4 @@ int Board::clearRows() {
     return rowsCleared;
 }
 
-bool Board::isInside(int x, int y) const { return ((x >= 0 && x < cols) && (y >= 0 && y < rows)); }
+bool Board::isInside(int row, int col) const { return ((col >= 0 && col < cols) && (row >= 0 && row < rows)); }

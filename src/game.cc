@@ -5,10 +5,9 @@
 #include <thread>
 
 // to do: decouple graphics from game, use observer pattern instead
-// also would be better to use smart pointers
 Game::Game(int rows, int cols): gameBoard(std::make_unique<Board>(rows + 2, cols)), gen(rd()), dis(0, 6) {
     currentBlock = createBlock();
-    currentBlock->shift(3, 0);
+    currentBlock->shift(0, 3);
     nextBlock = createBlock();
     graphics = std::make_unique<Display>(this, rows, cols);
 }
@@ -51,7 +50,7 @@ void Game::calculateScore() {
             }
         }
     }
-    // to do: update next block seperately
+
     graphics->updateInfo();
 }
 
@@ -62,7 +61,7 @@ void Game::reset() {
     levelLines = 0;
     totalLines = 0;
     currentBlock = createBlock();
-    currentBlock->shift(3, 0);
+    currentBlock->shift(0, 3);
     nextBlock = createBlock();
     graphics->render();
     graphics->updateNextBlock();
@@ -90,8 +89,8 @@ std::unique_ptr<Block> Game::createBlock() const {
 }
 
 bool Game::doesBlockCollide() const {
-    for (auto [x, y]: currentBlock->getCoordinates()) {
-        if (!(gameBoard->isInside(x, y)) || gameBoard->getCell(x, y) != ' ') return true;
+    for (auto [i, j]: currentBlock->getCoordinates()) {
+        if (!(gameBoard->isInside(i, j)) || gameBoard->getCell(i, j) != ' ') return true;
     }
     return false;
 }
@@ -103,36 +102,36 @@ void Game::rotateBlock(bool clockwise) {
     }
 }
 
-void Game::moveBlockSide(int x) {
-    currentBlock->shift(x, 0);
+void Game::moveBlockSide(int cols) {
+    currentBlock->shift(0, cols);
     if (doesBlockCollide()) {
-        currentBlock->shift(-x, 0);
+        currentBlock->shift(0, -cols);
     }
 }
 
 void Game::moveBlockDown() {
-    currentBlock->shift(0, 1);
+    currentBlock->shift(1, 0);
     if (doesBlockCollide()) {
-        currentBlock->shift(0, -1);
+        currentBlock->shift(-1, 0);
         placeBlock();
     }
 }
 
 void Game::dropBlock() {
     while (!doesBlockCollide()) {
-        currentBlock->shift(0, 1);
+        currentBlock->shift(1, 0);
     }
-    currentBlock->shift(0, -1);
+    currentBlock->shift(-1, 0);
     placeBlock();
 }
 
 void Game::placeBlock() {
-    for (auto [x, y]: currentBlock->getCoordinates()) {
-        gameBoard->setCell(x, y, currentBlock->getType());
+    for (auto [i, j]: currentBlock->getCoordinates()) {
+        gameBoard->setCell(i, j, currentBlock->getType());
     }
 
     currentBlock = std::move(nextBlock);
-    currentBlock->shift(3, 0);
+    currentBlock->shift(0, 3);
 
     if (doesBlockCollide()) {
         reset();
@@ -205,8 +204,8 @@ std::ostream &operator<<(std::ostream &out, const Game &game) {
     auto currentCoordinates = game.currentBlock->getCoordinates();
 
     // first two rows are for blocks to spawn and should not be printed
-    for (int j = 2; j < rows; ++j) {
-        for (int i = 0; i < cols; ++i) {
+    for (int i = 2; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
             if (std::find(currentCoordinates.begin(), currentCoordinates.end(), std::make_pair(i, j)) != currentCoordinates.end()) {
                 out << game.currentBlock->getType();
             } else {

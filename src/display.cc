@@ -46,7 +46,7 @@ void Display::initColorMap() {
     init_pair(6, 90, 238);    // purple
     init_pair(7, 196, 238);   // red
     init_pair(8, 238, 187);   // black
-    init_pair(9, 230, 187);  // white
+    init_pair(9, 230, 187);   // white
     init_pair(10, 152, 152);
     init_pair(11, 238, 238);
 
@@ -128,16 +128,16 @@ void Display::updateNextBlock() {
     auto nextCoordinates = subject->getNextBlock()->getCoordinates();
     char nextType = subject->getNextBlock()->getType();
 
-    for (int j = 1; j < 3; ++j) {
-        for (int i = 1; i < 5; ++i) {
+    for (int i = 1; i < 3; ++i) {
+        for (int j = 1; j < 5; ++j) {
             if (std::find(nextCoordinates.begin(), nextCoordinates.end(), std::make_pair(i - 1, j - 1)) != nextCoordinates.end()) {
                 int colorPair = colorMap[nextType];
                 wattron(nextBlock, COLOR_PAIR(colorPair));
-                mvwaddwstr(nextBlock, j, (i * 2) - 1, L"█▉");
+                mvwaddwstr(nextBlock, i, (j * 2) - 1, L"█▉");
                 wattroff(nextBlock, COLOR_PAIR(colorPair));
             } else {
                 wattron(nextBlock, COLOR_PAIR(8));
-                mvwaddwstr(nextBlock, j, (i * 2) - 1, L"▒▒");
+                mvwaddwstr(nextBlock, i, (j * 2) - 1, L"▒▒");
                 wattroff(nextBlock, COLOR_PAIR(8));
             }
         }

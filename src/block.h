@@ -5,7 +5,8 @@
 
 class Block {
     private:
-        std::vector<std::pair<int, int>> coordinates;
+        // (i, j) pairs
+        std::vector<std::pair<int, int>> coordinates; 
         std::pair<int, int> offset;
 
     public:
@@ -16,7 +17,7 @@ class Block {
         void setCoordinates(std::vector<std::pair<int, int>> coordinates);
         std::vector<std::pair<int, int>> getCoordinates() const;
 
-        void shift(int x, int y);
+        void shift(int rows, int cols);
         void rotate(bool clockwise = true);
 };
 

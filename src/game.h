@@ -33,7 +33,7 @@ class Game {
         bool doesBlockCollide() const;
 
         void rotateBlock(bool clockwise = true);
-        void moveBlockSide(int x);
+        void moveBlockSide(int cols);
         void moveBlockDown();
         void dropBlock();
         void placeBlock();

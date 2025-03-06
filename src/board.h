@@ -13,14 +13,14 @@ class Board {
         Board(int rows, int cols);
         ~Board() = default;
 
-        void setCell(int x, int y, char c);
-        char getCell(int x, int y) const;
+        void setCell(int row, int col, char c);
+        char getCell(int row, int col) const;
         int getWidth() const;
         int getHeight() const;
 
         void clear();
         int clearRows();
-        bool isInside(int x, int y) const;
+        bool isInside(int row, int col) const;
 };
 
 #endif

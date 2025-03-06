@@ -8,65 +8,63 @@ void Block::setCoordinates(std::vector<std::pair<int, int>> coordinates) { this-
 
 std::vector<std::pair<int, int>> Block::getCoordinates() const { 
     std::vector<std::pair<int, int>> position;
-    for (auto [x, y]: coordinates) {
-        position.push_back({x + offset.first, y + offset.second});
+    for (auto [i, j]: coordinates) {
+        position.push_back({i + offset.first, j + offset.second});
     }
     return position;
 }
 
-void Block::shift(int x, int y) {
-    offset.first += x;
-    offset.second += y;
+void Block::shift(int rows, int cols) {
+    offset.first += rows;
+    offset.second += cols;
 }
 
 
 // to do: might be better to implement SSR for rotations
 void Block::rotate(bool clockwise) {
     std::vector<std::pair<int, int>> rotatedCoordinates;
-    // if clockwise: (x, y) -> (-y, x)
-    //         else: (x, y) -> (y, -x)
+    // if clockwise: (i, j) -> (j, -i)
+    //         else: (i, j) -> (-j, i)
     int ri = clockwise? 1 : -1;
 
-    int oldMinX = INT_MAX;
-    int oldMinY = INT_MAX;
-    int newMinX = INT_MAX;
-    int newMinY = INT_MAX;
+    int oldMinM = INT_MAX, oldMinN = INT_MAX;
+    int newMinM = INT_MAX, newMinN = INT_MAX;
 
-    for (auto [x, y]: coordinates) {
-        if (x < oldMinX) oldMinX = x;
-        if (y < oldMinY) oldMinY = y;
+    for (auto [i, j]: coordinates) {
+        if (i < oldMinM) oldMinM = i;
+        if (j < oldMinN) oldMinN = j;
 
-        int newX = -y * ri;
-        int newY = x * ri;
-        rotatedCoordinates.push_back({newX, newY});
+        int newI = j * ri;
+        int newJ = -i * ri;
+        rotatedCoordinates.push_back({newI, newJ});
 
-        if (newX < newMinX) newMinX = newX;
-        if (newY < newMinY) newMinY = newY;
+        if (newI < newMinM) newMinM = newI;
+        if (newJ < newMinN) newMinN = newJ;
     }
 
-    std::pair<int, int> rotation_offset = {newMinX - oldMinX, newMinY - oldMinY};
+    std::pair<int, int> rotation_offset = {newMinM - oldMinM, newMinN - oldMinN};
 
-    for (auto &[x, y]: rotatedCoordinates) {
-        x -= rotation_offset.first;
-        y -= rotation_offset.second;
+    for (auto &[i, j]: rotatedCoordinates) {
+        i -= rotation_offset.first;
+        j -= rotation_offset.second;
     }
 
     this->coordinates = rotatedCoordinates;
 }
 
-IBlock::IBlock(): Block({{0, 1}, {1, 1}, {2, 1}, {3, 1}}) {}
+IBlock::IBlock(): Block({{1, 0}, {1, 1}, {1, 2}, {1, 3}}) {}
 
-JBlock::JBlock(): Block({{0, 0}, {0, 1}, {1, 1}, {2, 1}}) {}
+JBlock::JBlock(): Block({{0, 0}, {1, 0}, {1, 1}, {1, 2}}) {}
 
-LBlock::LBlock(): Block({{0, 1}, {1, 1}, {2, 1}, {2, 0}}) {}
+LBlock::LBlock(): Block({{1, 0}, {1, 1}, {1, 2}, {0, 2}}) {}
 
-OBlock::OBlock(): Block({{1, 0}, {2, 0}, {1, 1}, {2, 1}}) {}
+OBlock::OBlock(): Block({{1, 0}, {0, 2}, {1, 1}, {1, 2}}) {}
 
-SBlock::SBlock(): Block({{0, 1}, {1, 0}, {1, 1}, {2, 0}}) {}
+SBlock::SBlock(): Block({{1, 0}, {0, 1}, {1, 1}, {0, 2}}) {}
 
-TBlock::TBlock(): Block({{0, 1}, {1, 0}, {1, 1}, {2, 1}}) {}
+TBlock::TBlock(): Block({{1, 0}, {0, 1}, {1, 1}, {1, 2}}) {}
 
-ZBlock::ZBlock(): Block({{0, 0}, {1, 0}, {1, 1}, {2, 1}}) {}
+ZBlock::ZBlock(): Block({{0, 0}, {0, 1}, {1, 1}, {1, 2}}) {}
 
 char IBlock::getType() const { return 'I'; }
 
