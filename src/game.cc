@@ -1,4 +1,4 @@
-#include "game.h"
+#include "../include/game.h"
 #include <algorithm>
 #include <tuple>
 #include <chrono>

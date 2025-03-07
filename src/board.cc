@@ -1,4 +1,4 @@
-#include "board.h"
+#include "../include/board.h"
 
 Board::Board(int rows, int cols): rows(rows), cols(cols), cells(rows, std::vector<char>(cols, ' ')) {}
 

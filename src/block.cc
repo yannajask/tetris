@@ -1,4 +1,4 @@
-#include "block.h"
+#include "../include/block.h"
 #include <algorithm>
 #include <climits>
 
@@ -58,7 +58,7 @@ JBlock::JBlock(): Block({{0, 0}, {1, 0}, {1, 1}, {1, 2}}) {}
 
 LBlock::LBlock(): Block({{1, 0}, {1, 1}, {1, 2}, {0, 2}}) {}
 
-OBlock::OBlock(): Block({{1, 0}, {0, 2}, {1, 1}, {1, 2}}) {}
+OBlock::OBlock(): Block({{0, 1}, {0, 2}, {1, 1}, {1, 2}}) {}
 
 SBlock::SBlock(): Block({{1, 0}, {0, 1}, {1, 1}, {0, 2}}) {}
 

@@ -1,5 +1,5 @@
 #define NCURSES_WIDECHAR 1
-#include "display.h"
+#include "../include/display.h"
 #include <sstream>
 
 Display::Display(Game *subject, int rows, int cols): subject{subject}, rgb{has_colors()} {

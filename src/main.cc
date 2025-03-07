@@ -1,5 +1,5 @@
 #define NCURSES_WIDECHAR 1
-#include "game.h"
+#include "../include/game.h"
 #include <ncursesw/curses.h>
 #include <locale.h>
 
