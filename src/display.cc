@@ -8,6 +8,15 @@ Display::Display(Game *subject, int rows, int cols): subject{subject}, rgb{has_c
     int windowHeight = rows + 10; int windowWidth = (cols * 2) + 19;
     int yMax; int xMax;
     getmaxyx(stdscr, yMax, xMax);
+
+    // throw an exception if the terminal is too small to support graphics
+    if (yMax < windowHeight || xMax < windowWidth) {
+        std::stringstream msg;
+        msg << "Your terminal size is too small! Must be at least: "
+            << windowHeight << "x" << windowWidth << ".";
+        throw std::runtime_error(msg.str());
+    }
+
     mainWindow = newwin(windowHeight, windowWidth, (yMax / 2) - (windowHeight / 2), (xMax / 2) - (windowWidth / 2));
     drawBorder(mainWindow, windowHeight - 1, windowWidth - 2, 0, 0, "", true);
 
