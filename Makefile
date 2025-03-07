@@ -1,7 +1,7 @@
 ### Makefile, adapted from CS 246
 
 CXX = g++
-CXXFLAGS = -std=c++20 -g -Wall -Werror=vla -MD -fsanitize=undefined -DNCURSES_WIDECHAR
+CXXFLAGS = -std=c++20 -MD -DNCURSES_WIDECHAR
 LDFLAGS = -lncursesw
 
 ###
