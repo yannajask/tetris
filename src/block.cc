@@ -1,5 +1,4 @@
 #include "../include/block.h"
-#include <algorithm>
 #include <climits>
 
 Block::Block(std::vector<std::pair<int, int>> coordinates): coordinates(coordinates) {}
